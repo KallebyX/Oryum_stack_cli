@@ -4,7 +4,7 @@ ORYUM STACK CLI - Ponto de entrada principal
 import typer
 from typing import Optional
 from oryum_stack import __version__
-from oryum_stack.commands import new, make_model, make_route, make_api, db
+from oryum_stack.cli.commands import new, make_model
 from oryum_stack.utils.i18n import translate as _
 
 # Aplicação principal
@@ -16,12 +16,11 @@ app = typer.Typer(
 
 # Registrar grupos de comandos como subcomandos
 app.add_typer(new.app, name="new")
-app.add_typer(db.app, name="db")
 
 # Registrar comandos individuais
 app.command(name="make:model")(make_model.make_model)
-app.command(name="make:route")(make_route.make_route)
-app.command(name="make:api")(make_api.make_api)
+# app.command(name="make:route")(make_route.make_route)
+# app.command(name="make:api")(make_api.make_api)
 
 # Callback principal para opções globais
 @app.callback()

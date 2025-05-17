@@ -1,0 +1,27 @@
+{%- raw -%}
+"""Template de modelo SQLAlchemy gerado pela Oryum Stack CLI."""
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from oryum_stack.models.base import Base
+
+class {{ model_name }}(Base):
+    __tablename__ = "{{ model_name.lower() }}"
+
+    id = Column(Integer, primary_key=True, index=True)
+    {%- for field in fields %}
+    {{ field.name }} = Column({{ field.type|capitalize }}{% if field.length %}({{ field.length }}){% endif %}{% if not field.nullable %}, nullable=False{% endif %}{% if field.unique %}, unique=True{% endif %}{% if field.default %}, default={{ field.default }}{% endif %})
+    {%- endfor %}
+
+    {%- if timestamps %}
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    {%- endif %}
+
+    {%- for rel in relationships %}
+    {{ rel.name }} = relationship("{{ rel.model }}", back_populates="{{ model_name.lower() }}")
+    {%- endfor %}
+
+    def __repr__(self):
+        return f"<{{ model_name }} {{ '{{' }}self.id{{ '}}' }}>"
+{%- endraw -%}
