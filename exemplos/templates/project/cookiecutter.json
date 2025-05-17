@@ -1,0 +1,16 @@
+# Exemplo de cookiecutter.json para template de projeto
+{
+    "project_name": "Meu Projeto Flask",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+    "db_type": ["sqlite", "postgresql"],
+    "with_oauth": ["n", "y"],
+    "admin_theme": ["default", "modern", "dark"],
+    "python_version": "3.8",
+    "author_name": "Seu Nome",
+    "author_email": "seu.email@exemplo.com",
+    "_copy_without_render": [
+        "*.html",
+        "static/js/*.js",
+        "static/css/*.css"
+    ]
+}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuários{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Usuários</h1>
+    <a href="{{ url_for('usuario.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Novo Usuário
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>
+                            {% if usuario.foto_perfil %}
+                            <img src="{{ url_for('static', filename=usuario.foto_perfil) }}" 
+                                 alt="Foto de {{ usuario.nome }}" 
+                                 class="rounded-circle" 
+                                 width="40" height="40">
+                            {% else %}
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; color: white;">
+                                {{ usuario.nome[0].upper() }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>
+                            <span class="badge bg-{% if usuario.perfil == 'admin' %}danger{% else %}info{% endif %}">
+                                {{ usuario.perfil }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if usuario.ativo %}success{% else %}secondary{% endif %}">
+                                {{ 'Ativo' if usuario.ativo else 'Inativo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('usuario.show', id=usuario.id) }}" 
+                                   class="btn btn-info" title="Visualizar">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('usuario.edit', id=usuario.id) }}" 
+                                   class="btn btn-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal{{ usuario.id }}" 
+                                        title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Modal de confirmação de exclusão -->
+                            <div class="modal fade" id="deleteModal{{ usuario.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmar Exclusão</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Tem certeza que deseja excluir o usuário <strong>{{ usuario.nome }}</strong>?</p>
+                                            <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="{{ url_for('usuario.destroy', id=usuario.id) }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">Excluir</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <p class="text-muted mb-0">Nenhum usuário encontrado.</p>
+                            <a href="{{ url_for('usuario.create') }}" class="btn btn-primary mt-3">
+                                Criar Primeiro Usuário
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{# templates/snippets/model.py.jinja2 #}
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float, Text, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from .base import Base, db
+
+class {{ model_name }}(Base):
+    __tablename__ = '{{ model_name.lower() }}s'
+    
+    id = Column(Integer, primary_key=True)
+    
+    {# Gerar campos dinâmicos #}
+    {% for field in fields %}
+    {{ field.name }} = Column({{ field.type }}{% if field.length %}({{ field.length }}){% endif %}{% if field.nullable is defined and not field.nullable %}, nullable=False{% endif %}{% if field.unique %}, unique=True{% endif %}{% if field.default is defined %}, default={{ field.default }}{% endif %})
+    {% endfor %}
+    
+    {# Gerar relacionamentos #}
+    {% for rel in relationships %}
+    {% if rel.type == 'many' %}
+    {{ rel.name }} = relationship("{{ rel.model }}", secondary="{{ model_name.lower() }}_{{ rel.model.lower() }}", back_populates="{{ model_name.lower() }}s")
+    {% elif rel.type == 'one' %}
+    {{ rel.name }}_id = Column(Integer, ForeignKey('{{ rel.model.lower() }}s.id'))
+    {{ rel.name }} = relationship("{{ rel.model }}")
+    {% endif %}
+    {% endfor %}
+    
+    {# Adicionar timestamps se solicitado #}
+    {% if timestamps %}
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    {% endif %}
+    
+    def __repr__(self):
+        return f"<{{ model_name }} {self.id}>"
